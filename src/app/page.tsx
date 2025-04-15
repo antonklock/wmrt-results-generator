@@ -5,26 +5,27 @@ import type { NextPage } from "next";
 import React, { useMemo, useState } from "react";
 import { z } from "zod";
 import {
-  defaultMyCompProps,
   CompositionProps,
+  defaultMyCompProps,
   DURATION_IN_FRAMES,
   VIDEO_FPS,
   VIDEO_HEIGHT,
   VIDEO_WIDTH,
 } from "../../types/constants";
-import { RenderControls } from "../components/RenderControls";
-import { Spacing } from "../components/Spacing";
-import { Tips } from "../components/Tips";
 import OneOnOne from "../components/results/OneOnOne";
 
 const Home: NextPage = () => {
-  const [text, setText] = useState<string>(defaultMyCompProps.title);
+  // const inputProps: z.infer<typeof CompositionProps> = useMemo(() => {
+  //   return {
+  //     sailor1: "Brady",
+  //     sailor2: "Poole",
+  //     number1: 1,
+  //     number2: 0,
+  //   };
+  // }, []);
 
-  const inputProps: z.infer<typeof CompositionProps> = useMemo(() => {
-    return {
-      title: text,
-    };
-  }, [text]);
+  const [inputProps, setInputProps] =
+    useState<z.infer<typeof CompositionProps>>(defaultMyCompProps);
 
   return (
     <div>
@@ -45,16 +46,80 @@ const Home: NextPage = () => {
             />
           </div>
         </div>
-        <RenderControls
+        <div className="flex flex-col gap-2 justify-center items-center text-white">
+          <div className="flex flex-row gap-2">
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2">
+                <label htmlFor="sailor1" className="text-white">
+                  Sailor 1
+                </label>
+                <input
+                  id="sailor1"
+                  className="bg-transparent border-1 border-white rounded-md p-2"
+                  type="text"
+                  value={inputProps.sailor1}
+                  onChange={(e) =>
+                    setInputProps({ ...inputProps, sailor1: e.target.value })
+                  }
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="sailor2" className="text-white">
+                  Sailor 2
+                </label>
+                <input
+                  id="sailor2"
+                  className="bg-transparent border-1 border-white rounded-md p-2"
+                  type="text"
+                  value={inputProps.sailor2}
+                  onChange={(e) =>
+                    setInputProps({ ...inputProps, sailor2: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2">
+                <label htmlFor="number1" className="text-white">
+                  Number 1
+                </label>
+                <input
+                  id="number1"
+                  className="bg-transparent border-1 border-white rounded-md p-2"
+                  type="number"
+                  value={inputProps.number1}
+                  onChange={(e) =>
+                    setInputProps({
+                      ...inputProps,
+                      number1: parseInt(e.target.value),
+                    })
+                  }
+                />
+                <label htmlFor="number2" className="text-white">
+                  Number 2
+                </label>
+                <input
+                  id="number2"
+                  className="bg-transparent border-1 border-white rounded-md p-2"
+                  type="number"
+                  value={inputProps.number2}
+                  onChange={(e) =>
+                    setInputProps({
+                      ...inputProps,
+                      number2: parseInt(e.target.value),
+                    })
+                  }
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* <RenderControls
           text={text}
           setText={setText}
           inputProps={inputProps}
-        ></RenderControls>
-        <Spacing></Spacing>
-        <Spacing></Spacing>
-        <Spacing></Spacing>
-        <Spacing></Spacing>
-        <Tips></Tips>
+        ></RenderControls> */}
       </div>
     </div>
   );

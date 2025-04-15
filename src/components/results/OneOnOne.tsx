@@ -1,12 +1,16 @@
-import React, { useState } from "react";
 import { AbsoluteFill, Img, Video, useCurrentFrame, spring } from "remotion";
 
-const OneOnOne: React.FC = () => {
-  const [sailor1, setSailor1] = useState<string>("Brady");
-  const [sailor2, setSailor2] = useState<string>("Poole");
-  const [number1, setNumber1] = useState<number>(1);
-  const [number2, setNumber2] = useState<number>(0);
-
+const OneOnOne = ({
+  sailor1,
+  sailor2,
+  number1,
+  number2,
+}: {
+  sailor1: string;
+  sailor2: string;
+  number1: number;
+  number2: number;
+}) => {
   const frame = useCurrentFrame();
 
   const titleSpring = spring({
