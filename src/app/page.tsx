@@ -2,7 +2,7 @@
 
 import { Player } from "@remotion/player";
 import type { NextPage } from "next";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { z } from "zod";
 import {
   CompositionProps,
@@ -13,19 +13,56 @@ import {
   VIDEO_WIDTH,
 } from "../../types/constants";
 import OneOnOne from "../components/results/OneOnOne";
+import { ResultsList } from "../components/results/ResultsList";
+import { processMatchResults } from "../lib/utils/extractSailorNames";
 
 const Home: NextPage = () => {
-  // const inputProps: z.infer<typeof CompositionProps> = useMemo(() => {
-  //   return {
-  //     sailor1: "Brady",
-  //     sailor2: "Poole",
-  //     number1: 1,
-  //     number2: 0,
-  //   };
-  // }, []);
-
   const [inputProps, setInputProps] =
     useState<z.infer<typeof CompositionProps>>(defaultMyCompProps);
+  const [url, setUrl] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [results, setResults] = useState<MatchResult[]>([]);
+
+  const handleFetchResults = async () => {
+    if (!url) {
+      setError("Please enter a URL");
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/fetchMatchracingresults", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url: url + "feed.php?showall=true" }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch results");
+      }
+
+      const data = await response.json();
+      const sailorData = processMatchResults(data);
+      setResults(sailorData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSelectResult = (result: MatchResult) => {
+    setInputProps({
+      ...inputProps,
+      sailor1: result.sailor1,
+      sailor2: result.sailor2,
+    });
+  };
 
   return (
     <div>
@@ -47,79 +84,36 @@ const Home: NextPage = () => {
           </div>
         </div>
         <div className="flex flex-col gap-2 justify-center items-center text-white">
-          <div className="flex flex-row gap-2">
+          <div className="flex flex-col gap-2 w-full max-w-md">
             <div className="flex flex-col gap-2">
-              <div className="flex flex-col gap-2">
-                <label htmlFor="sailor1" className="text-white">
-                  Sailor 1
-                </label>
-                <input
-                  id="sailor1"
-                  className="bg-transparent border-1 border-white rounded-md p-2"
-                  type="text"
-                  value={inputProps.sailor1}
-                  onChange={(e) =>
-                    setInputProps({ ...inputProps, sailor1: e.target.value })
-                  }
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label htmlFor="sailor2" className="text-white">
-                  Sailor 2
-                </label>
-                <input
-                  id="sailor2"
-                  className="bg-transparent border-1 border-white rounded-md p-2"
-                  type="text"
-                  value={inputProps.sailor2}
-                  onChange={(e) =>
-                    setInputProps({ ...inputProps, sailor2: e.target.value })
-                  }
-                />
-              </div>
+              <label htmlFor="url" className="text-white">
+                Match Racing Results URL
+              </label>
+              <input
+                id="url"
+                className="bg-transparent border-1 border-white rounded-md p-2 w-full"
+                type="text"
+                placeholder="Enter match racing results URL"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+              />
             </div>
-
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-col gap-2">
-                <label htmlFor="number1" className="text-white">
-                  Number 1
-                </label>
-                <input
-                  id="number1"
-                  className="bg-transparent border-1 border-white rounded-md p-2"
-                  type="number"
-                  value={inputProps.number1}
-                  onChange={(e) =>
-                    setInputProps({
-                      ...inputProps,
-                      number1: parseInt(e.target.value),
-                    })
-                  }
-                />
-                <label htmlFor="number2" className="text-white">
-                  Number 2
-                </label>
-                <input
-                  id="number2"
-                  className="bg-transparent border-1 border-white rounded-md p-2"
-                  type="number"
-                  value={inputProps.number2}
-                  onChange={(e) =>
-                    setInputProps({
-                      ...inputProps,
-                      number2: parseInt(e.target.value),
-                    })
-                  }
-                />
-              </div>
-            </div>
+            <button
+              onClick={handleFetchResults}
+              disabled={isLoading}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+            >
+              {isLoading ? "Loading..." : "Fetch Results"}
+            </button>
+            {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+            {results.length > 0 && (
+              <ResultsList
+                results={results}
+                onSelectResult={handleSelectResult}
+              />
+            )}
           </div>
         </div>
-        {/* <RenderControls
-          text={text}
-          setText={setText}
-          inputProps={inputProps}
-        ></RenderControls> */}
       </div>
     </div>
   );

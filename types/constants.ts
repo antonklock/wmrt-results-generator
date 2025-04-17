@@ -9,7 +9,7 @@ export const CompositionProps = z.object({
 });
 
 export const defaultMyCompProps: z.infer<typeof CompositionProps> = {
-  sailor1: "Brady",
+  sailor1: "Klock",
   sailor2: "Poole",
   number1: 1,
   number2: 0,

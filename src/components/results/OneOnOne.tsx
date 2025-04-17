@@ -3,13 +3,9 @@ import { AbsoluteFill, Img, Video, useCurrentFrame, spring } from "remotion";
 const OneOnOne = ({
   sailor1,
   sailor2,
-  number1,
-  number2,
 }: {
   sailor1: string;
   sailor2: string;
-  number1: number;
-  number2: number;
 }) => {
   const frame = useCurrentFrame();
 
@@ -38,6 +34,16 @@ const OneOnOne = ({
     fps: 30,
     from: -50,
     to: 0,
+    config: {
+      damping: 200,
+    },
+  });
+
+  const beatSpring = spring({
+    frame: frame - 15,
+    fps: 30,
+    from: 0,
+    to: 1,
     config: {
       damping: 200,
     },
@@ -88,7 +94,16 @@ const OneOnOne = ({
                   opacity: opacity(10),
                 }}
               >
-                {sailor1} <span className="text-white">{number1}</span>
+                {sailor1}
+              </p>
+              <p
+                className="text-white text-4xl my-8"
+                style={{
+                  transform: `scale(${beatSpring})`,
+                  opacity: opacity(15),
+                }}
+              >
+                Beat
               </p>
               <p
                 className="text-[50px] font-bold"
@@ -97,7 +112,7 @@ const OneOnOne = ({
                   opacity: opacity(20),
                 }}
               >
-                {sailor2} <span className="text-white">{number2}</span>
+                {sailor2}
               </p>
             </div>
           </div>
