@@ -1,11 +1,19 @@
 interface MatchResult {
     sailor1: string;
     sailor2: string;
+    flight: number;
+    match: number;
 }
 
 export function extractSailorNames(matchString: string): MatchResult {
-    // Remove the match identifier (e.g., "F3M1: ")
-    const matchContent = matchString.split(": ")[1];
+    // Extract the match identifier (e.g., "F3M1: ")
+    const [identifier, matchContent] = matchString.split(": ");
+
+    // Extract flight and match numbers from identifier
+    const flightMatch = identifier.match(/F(\d+)/);
+    const matchMatch = identifier.match(/M(\d+)/);
+    const flight = flightMatch ? parseInt(flightMatch[1], 10) : 0;
+    const match = matchMatch ? parseInt(matchMatch[1], 10) : 0;
 
     // Split by " beat " to get winner and loser
     const [winner, loser] = matchContent.split(" beat ");
@@ -16,7 +24,9 @@ export function extractSailorNames(matchString: string): MatchResult {
 
     return {
         sailor1,
-        sailor2
+        sailor2,
+        flight,
+        match
     };
 }
 

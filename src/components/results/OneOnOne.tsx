@@ -3,9 +3,13 @@ import { AbsoluteFill, Img, Video, useCurrentFrame, spring } from "remotion";
 const OneOnOne = ({
   sailor1,
   sailor2,
+  flight,
+  match,
 }: {
   sailor1: string;
   sailor2: string;
+  flight: number;
+  match: number;
 }) => {
   const frame = useCurrentFrame();
 
@@ -84,7 +88,7 @@ const OneOnOne = ({
                 opacity: opacity(0),
               }}
             >
-              FLIGHT 1: MATCH 3
+              FLIGHT {flight}: MATCH {match}
             </h1>
             <div className="flex flex-col items-center justify-center text-2xl">
               <p

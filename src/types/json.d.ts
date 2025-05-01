@@ -17,4 +17,6 @@ declare module "*.json" {
 declare interface MatchResult {
     sailor1: string;
     sailor2: string;
+    flight: number;
+    match: number;
 }

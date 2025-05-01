@@ -61,12 +61,14 @@ const Home: NextPage = () => {
       ...inputProps,
       sailor1: result.sailor1,
       sailor2: result.sailor2,
+      flight: result.flight,
+      match: result.match,
     });
   };
 
   return (
     <div>
-      <div className="max-w-screen-md m-auto mb-5 mt-16">
+      <div className="max-w-screen-md px-8 md-px-0 m-auto mb-5 mt-16">
         <div className="flex justify-center mb-10 rounded-2xl">
           <div className="w-[50%]">
             <Player
