@@ -1,13 +1,13 @@
 import { AbsoluteFill, Img, Video, useCurrentFrame, spring } from "remotion";
 
 const OneOnOne = ({
-  sailor1,
-  sailor2,
+  winner,
+  loser,
   flight,
   match,
 }: {
-  sailor1: string;
-  sailor2: string;
+  winner: string;
+  loser: string;
   flight: number;
   match: number;
 }) => {
@@ -98,7 +98,7 @@ const OneOnOne = ({
                   opacity: opacity(10),
                 }}
               >
-                {sailor1}
+                {winner}
               </p>
               <p
                 className="text-white text-4xl my-8"
@@ -116,7 +116,7 @@ const OneOnOne = ({
                   opacity: opacity(20),
                 }}
               >
-                {sailor2}
+                {loser}
               </p>
             </div>
           </div>

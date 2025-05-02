@@ -1,8 +1,8 @@
 "use client";
 
-import { Player } from "@remotion/player";
+import { Player, PlayerRef } from "@remotion/player";
 import type { NextPage } from "next";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { z } from "zod";
 import {
   CompositionProps,
@@ -23,6 +23,7 @@ const Home: NextPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<MatchResult[]>([]);
+  const playerRef = useRef<PlayerRef>(null);
 
   const handleFetchResults = async () => {
     if (!url) {
@@ -57,10 +58,14 @@ const Home: NextPage = () => {
   };
 
   const handleSelectResult = (result: MatchResult) => {
+    if (playerRef.current) {
+      playerRef.current.seekTo(0);
+    }
+
     setInputProps({
       ...inputProps,
-      sailor1: result.sailor1,
-      sailor2: result.sailor2,
+      winner: result.winner,
+      loser: result.loser,
       flight: result.flight,
       match: result.match,
     });
@@ -72,6 +77,7 @@ const Home: NextPage = () => {
         <div className="flex justify-center mb-10 rounded-2xl">
           <div className="w-[50%]">
             <Player
+              ref={playerRef}
               component={OneOnOne}
               inputProps={inputProps}
               durationInFrames={DURATION_IN_FRAMES}

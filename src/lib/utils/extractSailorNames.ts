@@ -1,10 +1,3 @@
-interface MatchResult {
-    sailor1: string;
-    sailor2: string;
-    flight: number;
-    match: number;
-}
-
 export function extractSailorNames(matchString: string): MatchResult {
     // Extract the match identifier (e.g., "F3M1: ")
     const [identifier, matchContent] = matchString.split(": ");
@@ -16,15 +9,15 @@ export function extractSailorNames(matchString: string): MatchResult {
     const match = matchMatch ? parseInt(matchMatch[1], 10) : 0;
 
     // Split by " beat " to get winner and loser
-    const [winner, loser] = matchContent.split(" beat ");
+    const [winnerName, loserName] = matchContent.split(" beat ");
 
     // Extract just the sailor names (remove team/club names in parentheses)
-    const sailor1 = winner.split(" (")[0].trim();
-    const sailor2 = loser.split(" (")[0].trim();
+    const winner = winnerName.split(" (")[0].trim();
+    const loser = loserName.split(" (")[0].trim();
 
     return {
-        sailor1,
-        sailor2,
+        winner,
+        loser,
         flight,
         match
     };

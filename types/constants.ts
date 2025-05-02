@@ -2,8 +2,8 @@ import { z } from "zod";
 export const COMP_NAME = "MyComp";
 
 export const CompositionProps = z.object({
-  sailor1: z.string(),
-  sailor2: z.string(),
+  winner: z.string(),
+  loser: z.string(),
   flight: z.number(),
   match: z.number(),
   number1: z.number(),
@@ -11,8 +11,8 @@ export const CompositionProps = z.object({
 });
 
 export const defaultMyCompProps: z.infer<typeof CompositionProps> = {
-  sailor1: "Klock",
-  sailor2: "Poole",
+  winner: "Klock",
+  loser: "Poole",
   flight: 1,
   match: 1,
   number1: 1,

@@ -2,10 +2,7 @@ import React, { useEffect } from "react";
 import { ResultListItem } from "./ResultListItem";
 
 interface ResultsListProps {
-  results: Array<{
-    sailor1: string;
-    sailor2: string;
-  }>;
+  results: Array<MatchResult>;
   onSelectResult: (result: MatchResult) => void;
 }
 
@@ -22,7 +19,7 @@ export const ResultsList: React.FC<ResultsListProps> = ({
       <div className="flex flex-col gap-2">
         {results.map((result, index) => (
           <ResultListItem
-            key={index + result.sailor1 + result.sailor2}
+            key={index + result.winner + result.loser}
             result={result}
             onClick={() => onSelectResult(result)}
           />

@@ -8,15 +8,15 @@ declare module "*.json" {
         h: number;
         nm: string;
         ddd: number;
-        assets: any[];
-        layers: any[];
+        // assets: any[];
+        // layers: any[];
     };
     export default value;
 }
 
 declare interface MatchResult {
-    sailor1: string;
-    sailor2: string;
+    winner: string;
+    loser: string;
     flight: number;
     match: number;
 }
