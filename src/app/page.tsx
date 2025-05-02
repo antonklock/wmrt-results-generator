@@ -23,9 +23,10 @@ const Home: NextPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<MatchResult[]>([]);
+  const [invalidUrl, setInvalidUrl] = useState<boolean>(false);
   const playerRef = useRef<PlayerRef>(null);
 
-  const handleFetchResults = async () => {
+  const fetchResults = async () => {
     if (!url) {
       setError("Please enter a URL");
       return;
@@ -44,16 +45,33 @@ const Home: NextPage = () => {
       });
 
       if (!response.ok) {
+        handleInvalidUrl();
         throw new Error("Failed to fetch results");
       }
 
       const data = await response.json();
       const sailorData = processMatchResults(data);
-      setResults(sailorData);
+      if (sailorData.length === 0) {
+        return null;
+      } else {
+        return sailorData;
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
+      return null;
     } finally {
+      console.log("finally");
       setIsLoading(false);
+    }
+  };
+
+  const handleGetResults = async () => {
+    const sailorData = await fetchResults();
+    if (sailorData) {
+      setResults(sailorData);
+      handleSelectResult(sailorData[0]);
+    } else {
+      handleInvalidUrl();
     }
   };
 
@@ -71,49 +89,69 @@ const Home: NextPage = () => {
     });
   };
 
+  const handleInvalidUrl = () => {
+    setInvalidUrl(true);
+    setTimeout(() => {
+      setInvalidUrl(false);
+    }, 3000);
+  };
+
   return (
     <div>
       <div className="max-w-screen-md px-8 md-px-0 m-auto mb-5 mt-16">
         <div className="flex justify-center mb-10 rounded-2xl">
-          <div className="w-[50%]">
-            <Player
-              ref={playerRef}
-              component={OneOnOne}
-              inputProps={inputProps}
-              durationInFrames={DURATION_IN_FRAMES}
-              fps={VIDEO_FPS}
-              compositionHeight={VIDEO_HEIGHT}
-              compositionWidth={VIDEO_WIDTH}
-              style={{ width: "100%" }}
-              controls
-              autoPlay
-              loop
-            />
-          </div>
+          {results.length > 0 ? (
+            <div className="w-[50%]">
+              <Player
+                ref={playerRef}
+                component={OneOnOne}
+                inputProps={inputProps}
+                durationInFrames={DURATION_IN_FRAMES}
+                fps={VIDEO_FPS}
+                compositionHeight={VIDEO_HEIGHT}
+                compositionWidth={VIDEO_WIDTH}
+                style={{ width: "100%" }}
+                controls
+                autoPlay
+                loop
+              />
+            </div>
+          ) : (
+            <div>
+              <p className="text-4xl text-white">
+                Enter a URL to fetch results
+              </p>
+            </div>
+          )}
         </div>
         <div className="flex flex-col gap-2 justify-center items-center text-white">
           <div className="flex flex-col gap-2 w-full max-w-md">
             <div className="flex flex-col gap-2">
-              <label htmlFor="url" className="text-white">
-                Match Racing Results URL
-              </label>
               <input
                 id="url"
                 className="bg-transparent border-1 border-white rounded-md p-2 w-full"
+                style={{
+                  borderColor: invalidUrl ? "red" : "white",
+                }}
                 type="text"
-                placeholder="Enter match racing results URL"
+                placeholder="Enter url from matchracingresults.com"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
               />
             </div>
+            {invalidUrl && (
+              <p className="text-red-500 text-sm mt-2 font-bold">Invalid URL</p>
+            )}
+            {error && invalidUrl && (
+              <div className="text-red-500 text-sm -mt-2">{error}</div>
+            )}
             <button
-              onClick={handleFetchResults}
+              onClick={handleGetResults}
               disabled={isLoading}
               className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
             >
               {isLoading ? "Loading..." : "Fetch Results"}
             </button>
-            {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
             {results.length > 0 && (
               <ResultsList
                 results={results}
