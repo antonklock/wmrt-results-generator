@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { AbsoluteFill, Img, Video, useCurrentFrame, spring } from "remotion";
 
 const OneOnOne = ({
@@ -6,14 +7,17 @@ const OneOnOne = ({
   flight,
   match,
   bgVideoSrc,
+  setIsPlayerReady,
 }: {
   winner: string;
   loser: string;
   flight: number;
   match: number;
   bgVideoSrc: string;
+  setIsPlayerReady: (value: boolean) => void;
 }) => {
   const frame = useCurrentFrame();
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const titleSpring = spring({
     frame,
@@ -76,9 +80,27 @@ const OneOnOne = ({
       },
     });
 
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.addEventListener("canplay", () => {
+        setIsPlayerReady(true);
+      });
+    }
+  }, [setIsPlayerReady]);
+
+  useEffect(() => {
+    setIsPlayerReady(false);
+  }, [bgVideoSrc, setIsPlayerReady]);
+
   return (
     <>
-      <Video src={bgVideoSrc} className="object-cover" />
+      <div className="fixed inset-0 w-full h-full flex justify-center items-center">
+        <Video
+          src={bgVideoSrc}
+          className="w-full h-full object-cover"
+          ref={videoRef}
+        />
+      </div>
       <AbsoluteFill className="opacity-85 bg-[#0c2340] w-[1080px] h-[1920px]"></AbsoluteFill>
       <div className="absolute inset-0 text-white">
         <div className="flex flex-col items-center justify-between h-full w-full">
