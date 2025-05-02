@@ -1,203 +1,127 @@
 "use client";
 
-import { Player, PlayerRef } from "@remotion/player";
-import type { NextPage } from "next";
-import React, { useEffect, useRef, useState } from "react";
-import { z } from "zod";
-import {
-  CompositionProps,
-  defaultMyCompProps,
-  DURATION_IN_FRAMES,
-  VIDEO_FPS,
-  VIDEO_HEIGHT,
-  VIDEO_WIDTH,
-} from "../../types/constants";
-import OneOnOne from "../components/results/OneOnOne";
-import { ResultsList } from "../components/results/ResultsList";
-import { processMatchResults } from "../lib/utils/extractSailorNames";
+import { useState, useEffect } from "react";
+import { Event } from "../types/event"; // Adjusted path
+import { useLocalStorage } from "../lib/hooks/useLocalStorage"; // Adjusted path
+import { EventCard } from "../components/admin/EventCard"; // Adjusted path
+import { AddEventCard } from "../components/admin/AddEventCard"; // Re-enabled import
+import { EventFormCard } from "../components/admin/EventFormCard"; // Import new form card
 
-const Home: NextPage = () => {
-  const [inputProps, setInputProps] =
-    useState<z.infer<typeof CompositionProps>>(defaultMyCompProps);
-  const [url, setUrl] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [results, setResults] = useState<MatchResult[]>([]);
-  const [invalidUrl, setInvalidUrl] = useState<boolean>(false);
-  const playerRef = useRef<PlayerRef>(null);
-  const [isPlayerReady, setIsPlayerReady] = useState<boolean>(false);
-  const [bgVideoSrc, setBgVideoSrc] = useState<string>(
-    "https://www.kwmedia.klockworks.xyz/projects/wmrt-results-generator/bg-videos/wmrt-bg-01.mp4",
-  );
+// Basic UUID generator (replace with a robust library like `uuid` if needed)
+const generateUUID = () =>
+  "xxxx-xxxx-xxx-xxxx".replace(/[x]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 
-  const fetchResults = async () => {
-    if (!url) {
-      setError("Please enter a URL");
+// Renamed component to reflect it's now the main page
+export default function AdminDashboardPage() {
+  const [events, setEvents] = useLocalStorage<Event[]>("adminEvents", []);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [isClient, setIsClient] = useState(false); // State to track client mount
+
+  // Set isClient to true only on the client side after mount
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const handleAddEventClick = () => {
+    setShowAddForm(true);
+  };
+
+  const handleCancelAddEvent = () => {
+    setShowAddForm(false);
+  };
+
+  // Modified to accept title/url and perform validation here
+  const handleSaveNewEvent = (title: string, urlValue: string) => {
+    const trimmedTitle = title.trim();
+    let trimmedUrl = urlValue.trim();
+
+    if (!trimmedTitle) {
+      alert("Please enter a title.");
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
+    if (!trimmedUrl) {
+      alert("Please enter a URL.");
+      return;
+    }
 
+    if (
+      !trimmedUrl.startsWith("http://") &&
+      !trimmedUrl.startsWith("https://")
+    ) {
+      trimmedUrl = "https://" + trimmedUrl; // Assume https if no protocol
+    }
     try {
-      const response = await fetch("/api/fetchMatchracingresults", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ url: url + "feed.php?showall=true" }),
-      });
-
-      if (!response.ok) {
-        handleInvalidUrl();
-        throw new Error("Failed to fetch results");
-      }
-
-      const data = await response.json();
-      const sailorData = processMatchResults(data);
-      if (sailorData.length === 0) {
-        return null;
-      } else {
-        return sailorData;
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      return null;
-    } finally {
-      console.log("finally");
-      setIsLoading(false);
+      new URL(trimmedUrl); // Check if URL is valid
+    } catch /* _ */ {
+      alert("Please enter a valid URL.");
+      return;
     }
-  };
 
-  const handleGetResults = async () => {
-    setIsPlayerReady(false);
-
-    const sailorData = await fetchResults();
-    if (sailorData) {
-      setResults(sailorData);
-      handleSelectResult(sailorData[0]);
-    } else {
-      handleInvalidUrl();
-    }
-  };
-
-  const handleSelectResult = (result: MatchResult) => {
-    const setRandomVideoBg = () => {
-      const randomVideoNumber = Math.floor(Math.random() * 5) + 1;
-      const randomVideo = `https://www.kwmedia.klockworks.xyz/projects/wmrt-results-generator/bg-videos/wmrt-bg-0${randomVideoNumber}.mp4`;
-      if (randomVideo !== bgVideoSrc) {
-        setBgVideoSrc(randomVideo);
-      } else {
-        setRandomVideoBg();
-      }
+    const newEvent: Event = {
+      id: generateUUID(),
+      title: trimmedTitle,
+      url: trimmedUrl,
+      active: true, // Default to active
     };
-
-    setRandomVideoBg();
-
-    if (playerRef.current) {
-      playerRef.current.seekTo(0);
-    }
-
-    setInputProps({
-      ...inputProps,
-      winner: result.winner,
-      loser: result.loser,
-      flight: result.flight,
-      match: result.match,
-      bgVideoSrc: bgVideoSrc,
-    });
+    setEvents([...events, newEvent]);
+    setShowAddForm(false); // Hide form after saving
   };
 
-  const handleInvalidUrl = () => {
-    setInvalidUrl(true);
-    setTimeout(() => {
-      setInvalidUrl(false);
-    }, 3000);
+  const handleToggleActive = (id: string, active: boolean) => {
+    setEvents(
+      events.map((event: Event) =>
+        event.id === id ? { ...event, active } : event,
+      ),
+    );
   };
 
-  useEffect(() => {
-    if (playerRef.current) {
-      if (isPlayerReady) {
-        playerRef.current.seekTo(0);
-        playerRef.current.play();
-      } else {
-        playerRef.current.seekTo(0);
-        playerRef.current.pause();
-      }
-    }
-  }, [isPlayerReady]);
-
-  useEffect(() => {
-    console.log("isPlayerReady", isPlayerReady);
-  }, [isPlayerReady]);
+  const handleDeleteEvent = (id: string) => {
+    setEvents(events.filter((event) => event.id !== id));
+  };
 
   return (
-    <div>
-      <div className="max-w-screen-md px-8 md-px-0 m-auto mb-5 mt-16">
-        <div className="flex justify-center mb-10 rounded-2xl">
-          {results.length > 0 ? (
-            <div className="w-[50%]">
-              <Player
-                ref={playerRef}
-                component={OneOnOne}
-                inputProps={inputProps}
-                durationInFrames={DURATION_IN_FRAMES}
-                fps={VIDEO_FPS}
-                compositionHeight={VIDEO_HEIGHT}
-                compositionWidth={VIDEO_WIDTH}
-                style={{ width: "100%" }}
-                controls
-                autoPlay={true}
-                loop
-              />
-            </div>
+    <div className="container mx-auto p-4 md:p-8 text-gray-100 min-h-screen">
+      <h1 className="text-4xl md:text-6xl font-bold mb-6">
+        WMRT Results Video Generator
+      </h1>
+      <h1 className="text-3xl font-bold mb-6 mt-12">Events</h1>
+
+      {/* Event Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 min-h-[100px]">
+        {/* Render existing event cards (only on client) */}
+        {isClient &&
+          events.map((event: Event) => (
+            <EventCard
+              key={event.id}
+              event={event}
+              onToggleActive={handleToggleActive}
+              onDelete={handleDeleteEvent}
+            />
+          ))}
+
+        {/* Render AddEventCard or EventFormCard (only on client) */}
+        {isClient &&
+          (showAddForm ? (
+            <EventFormCard
+              onSave={handleSaveNewEvent}
+              onCancel={handleCancelAddEvent}
+            />
           ) : (
-            <div>
-              <p className="text-4xl text-white">
-                Enter a URL to fetch results
-              </p>
-            </div>
-          )}
-        </div>
-        <div className="flex flex-col gap-2 justify-center items-center text-white">
-          <div className="flex flex-col gap-2 w-full max-w-md">
-            <div className="flex flex-col gap-2">
-              <input
-                id="url"
-                className="bg-transparent border-1 border-white rounded-md p-2 w-full"
-                style={{
-                  borderColor: invalidUrl ? "red" : "white",
-                }}
-                type="text"
-                placeholder="Enter url from matchracingresults.com"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-              />
-            </div>
-            {invalidUrl && (
-              <p className="text-red-500 text-sm mt-2 font-bold">Invalid URL</p>
-            )}
-            {error && invalidUrl && (
-              <div className="text-red-500 text-sm -mt-2">{error}</div>
-            )}
-            <button
-              onClick={handleGetResults}
-              disabled={isLoading}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
-            >
-              {isLoading ? "Loading..." : "Fetch Results"}
-            </button>
-            {results.length > 0 && (
-              <ResultsList
-                results={results}
-                onSelectResult={handleSelectResult}
-              />
-            )}
+            <AddEventCard onClick={handleAddEventClick} />
+          ))}
+
+        {/* Placeholder for initial server render / before hydration */}
+        {!isClient && (
+          <div className="bg-gray-800/50 border-2 border-dashed border-gray-600 rounded-lg p-4 flex flex-col items-center justify-center aspect-[4/3] sm:aspect-square h-full">
+            {/* Skeleton or loading state can go here */}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
-};
-
-export default Home;
+}
