@@ -82,7 +82,8 @@ const Home: NextPage = () => {
 
     const getRandomVideo = () => {
       const randomVideo = Math.floor(Math.random() * 5) + 1;
-      return `/videos/wmrt-bg-0${randomVideo}.mp4`;
+      // return `/videos/wmrt-bg-0${randomVideo}.mp4`;
+      return `https://www.kwmedia.klockworks.xyz/projects/wmrt-results-generator/bg-videos/wmrt-bg-0${randomVideo}.mp4`;
     };
 
     setInputProps({
