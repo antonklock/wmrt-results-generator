@@ -1,5 +1,10 @@
-import { useEffect, useRef } from "react";
-import { AbsoluteFill, Img, Video, useCurrentFrame, spring } from "remotion";
+import {
+  AbsoluteFill,
+  Img,
+  useCurrentFrame,
+  spring,
+  OffthreadVideo,
+} from "remotion";
 
 const OneOnOne = ({
   winner,
@@ -7,17 +12,14 @@ const OneOnOne = ({
   flight,
   match,
   bgVideoSrc,
-  setIsPlayerReady,
 }: {
   winner: string;
   loser: string;
   flight: number;
   match: number;
   bgVideoSrc: string;
-  setIsPlayerReady: (value: boolean) => void;
 }) => {
   const frame = useCurrentFrame();
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   const titleSpring = spring({
     frame,
@@ -80,25 +82,12 @@ const OneOnOne = ({
       },
     });
 
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.addEventListener("canplay", () => {
-        setIsPlayerReady(true);
-      });
-    }
-  }, [setIsPlayerReady]);
-
-  useEffect(() => {
-    setIsPlayerReady(false);
-  }, [bgVideoSrc, setIsPlayerReady]);
-
   return (
     <>
       <div className="fixed inset-0 w-full h-full flex justify-center items-center">
-        <Video
+        <OffthreadVideo
           src={bgVideoSrc}
           className="w-full h-full object-cover"
-          ref={videoRef}
         />
       </div>
       <AbsoluteFill className="opacity-85 bg-[#0c2340] w-[1080px] h-[1920px]"></AbsoluteFill>
@@ -151,7 +140,10 @@ const OneOnOne = ({
               opacity: opacity(0),
             }}
           >
-            <Img src="/images/wmrt-logo.png" className="w-[100px] h-[100px]" />
+            <Img
+              src="https://www.kwmedia.klockworks.xyz/projects/wmrt-results-generator/images/wmrt-logo.png"
+              className="w-[100px] h-[100px]"
+            />
           </div>
         </div>
       </div>

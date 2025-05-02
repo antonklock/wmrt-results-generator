@@ -26,6 +26,10 @@ const Home: NextPage = () => {
   const [invalidUrl, setInvalidUrl] = useState<boolean>(false);
   const playerRef = useRef<PlayerRef>(null);
   const [isPlayerReady, setIsPlayerReady] = useState<boolean>(false);
+  const [bgVideoSrc, setBgVideoSrc] = useState<string>(
+    "https://www.kwmedia.klockworks.xyz/projects/wmrt-results-generator/bg-videos/wmrt-bg-01.mp4",
+  );
+
   const fetchResults = async () => {
     if (!url) {
       setError("Please enter a URL");
@@ -78,14 +82,21 @@ const Home: NextPage = () => {
   };
 
   const handleSelectResult = (result: MatchResult) => {
+    const setRandomVideoBg = () => {
+      const randomVideoNumber = Math.floor(Math.random() * 5) + 1;
+      const randomVideo = `https://www.kwmedia.klockworks.xyz/projects/wmrt-results-generator/bg-videos/wmrt-bg-0${randomVideoNumber}.mp4`;
+      if (randomVideo !== bgVideoSrc) {
+        setBgVideoSrc(randomVideo);
+      } else {
+        setRandomVideoBg();
+      }
+    };
+
+    setRandomVideoBg();
+
     if (playerRef.current) {
       playerRef.current.seekTo(0);
     }
-
-    const getRandomVideo = () => {
-      const randomVideo = Math.floor(Math.random() * 5) + 1;
-      return `https://www.kwmedia.klockworks.xyz/projects/wmrt-results-generator/bg-videos/wmrt-bg-0${randomVideo}.mp4`;
-    };
 
     setInputProps({
       ...inputProps,
@@ -93,8 +104,7 @@ const Home: NextPage = () => {
       loser: result.loser,
       flight: result.flight,
       match: result.match,
-      bgVideoSrc: getRandomVideo(),
-      setIsPlayerReady: (value: boolean) => setIsPlayerReady(value),
+      bgVideoSrc: bgVideoSrc,
     });
   };
 
@@ -124,13 +134,7 @@ const Home: NextPage = () => {
   return (
     <div>
       <div className="max-w-screen-md px-8 md-px-0 m-auto mb-5 mt-16">
-        <div
-          className="flex justify-center mb-10 rounded-2xl"
-          style={{
-            opacity: isPlayerReady ? 1 : 0,
-            transition: "opacity 0.3s ease-in-out",
-          }}
-        >
+        <div className="flex justify-center mb-10 rounded-2xl">
           {results.length > 0 ? (
             <div className="w-[50%]">
               <Player
@@ -143,7 +147,7 @@ const Home: NextPage = () => {
                 compositionWidth={VIDEO_WIDTH}
                 style={{ width: "100%" }}
                 controls
-                autoPlay={isPlayerReady}
+                autoPlay={true}
                 loop
               />
             </div>

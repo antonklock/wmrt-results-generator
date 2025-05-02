@@ -9,7 +9,6 @@ export const CompositionProps = z.object({
   number1: z.number(),
   number2: z.number(),
   bgVideoSrc: z.string(),
-  setIsPlayerReady: z.function().args(z.boolean()).returns(z.void()),
 });
 
 export const defaultMyCompProps: z.infer<typeof CompositionProps> = {
@@ -19,8 +18,7 @@ export const defaultMyCompProps: z.infer<typeof CompositionProps> = {
   match: 1,
   number1: 1,
   number2: 0,
-  bgVideoSrc: "/videos/wmrt-bg-01.mp4",
-  setIsPlayerReady: () => { },
+  bgVideoSrc: "https://www.kwmedia.klockworks.xyz/projects/wmrt-results-generator/bg-videos/wmrt-bg-01.mp4",
 };
 
 export const DURATION_IN_FRAMES = 449;
