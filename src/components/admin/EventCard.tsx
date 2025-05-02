@@ -25,7 +25,7 @@ export function EventCard({ event, onToggleActive, onDelete }: EventCardProps) {
 
   return (
     <div
-      className={`relative bg-gray-800 border ${event.active ? "border-green-600" : "border-gray-700"} rounded-lg p-4 shadow-md flex flex-col justify-between h-full transition-colors duration-200 min-h-[250px]`}
+      className={`relative bg-gray-800 border ${event.active ? "border-green-700" : "border-gray-700/50"} rounded-2xl p-4 shadow-lg flex flex-col justify-between h-full transition-colors duration-200 min-h-[250px]`}
     >
       {/* Delete Button (Top Right) */}
       <button

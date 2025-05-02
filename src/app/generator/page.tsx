@@ -155,7 +155,7 @@ function GeneratorPageContent() {
           <h2 className="text-white text-xl font-bold pl-4 mb-2">
             Match Results
           </h2>
-          <div className="w-full md:w-1/2 max-h-[80vh] overflow-y-auto p-4 bg-gray-800 rounded-2xl shadow-lg scrollbar">
+          <div className="w-full max-h-[80vh] overflow-y-auto p-4 bg-gray-800 rounded-2xl shadow-lg scrollbar">
             {results.length > 0 ? (
               <ResultsList
                 results={results}

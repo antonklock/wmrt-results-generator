@@ -24,7 +24,7 @@ export function EventFormCard({
   };
 
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 shadow-md flex flex-col justify-between h-full min-h-[250px]">
+    <div className="bg-gray-800 border border-gray-700/50 rounded-2xl p-4 shadow-lg flex flex-col justify-between h-full min-h-[250px]">
       {/* Form Content */}
       <div className="flex-grow">
         <h2 className="text-lg font-semibold text-gray-100 mb-3">

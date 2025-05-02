@@ -11,10 +11,8 @@ export function AddEventCard({ onClick }: AddEventCardProps) {
   return (
     <button
       onClick={onClick}
-      // Adjusted styles for dark theme and consistency with EventCard
-      // Removed aspect ratio classes: aspect-[4/3] sm:aspect-square
-      // Added minimum height
-      className="bg-gray-800/50 border-2 border-dashed border-gray-600 hover:border-gray-500 rounded-lg p-4 flex flex-col items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500 cursor-pointer h-full text-gray-500 hover:text-gray-400 transition duration-150 ease-in-out min-h-[250px]"
+      // Changed: Solid bg, removed dashed border, added rounded-2xl, shadow-lg, adjusted hover/focus, text colors
+      className="bg-gray-800 hover:bg-gray-700/80 border border-gray-700/50 hover:border-gray-600 rounded-2xl p-4 shadow-lg flex flex-col items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500 cursor-pointer h-full text-gray-500 hover:text-gray-300 transition duration-150 ease-in-out min-h-[250px]"
       aria-label="Add new event"
     >
       {/* <Plus className="h-12 w-12" /> */}

@@ -85,7 +85,7 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-8 text-gray-100 min-h-screen">
+    <div className="container mx-auto p-4 md:p-8 bg-gray-900 text-white min-h-screen">
       <h1 className="text-4xl md:text-6xl font-bold mb-6">
         WMRT Results Video Generator
       </h1>
@@ -117,8 +117,9 @@ export default function AdminDashboardPage() {
 
         {/* Placeholder for initial server render / before hydration */}
         {!isClient && (
-          <div className="bg-gray-800/50 border-2 border-dashed border-gray-600 rounded-lg p-4 flex flex-col items-center justify-center aspect-[4/3] sm:aspect-square h-full">
+          <div className="bg-gray-800 rounded-2xl shadow-lg p-4 flex flex-col items-center justify-center min-h-[250px]">
             {/* Skeleton or loading state can go here */}
+            <span className="text-gray-500">Loading...</span>
           </div>
         )}
       </div>
