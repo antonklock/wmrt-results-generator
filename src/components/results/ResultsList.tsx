@@ -15,7 +15,6 @@ export const ResultsList: React.FC<ResultsListProps> = ({
   }, [results]);
   return (
     <div className="flex flex-col gap-4 w-full max-w-md">
-      <h2 className="text-white text-xl font-bold">Match Results</h2>
       <div className="flex flex-col gap-2">
         {results.map((result, index) => (
           <ResultListItem

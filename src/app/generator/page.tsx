@@ -33,13 +33,11 @@ function GeneratorPageContent() {
 
   const [inputProps, setInputProps] =
     useState<z.infer<typeof CompositionProps>>(defaultMyCompProps);
-  const [url, setUrl] = useState<string>(previewUrl || "");
+  const [url] = useState<string>(previewUrl || "");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<MatchResult[]>([]);
-  const [invalidUrl, setInvalidUrl] = useState<boolean>(false);
   const playerRef = useRef<PlayerRef>(null);
-  const [isPlayerReady, setIsPlayerReady] = useState<boolean>(false);
   const [bgVideoSrc, setBgVideoSrc] = useState<string>(
     "https://www.kwmedia.klockworks.xyz/projects/wmrt-results-generator/bg-videos/wmrt-bg-01.mp4",
   );
@@ -69,7 +67,6 @@ function GeneratorPageContent() {
       });
 
       if (!response.ok) {
-        handleInvalidUrl();
         throw new Error("Failed to fetch results");
       }
 
@@ -82,6 +79,7 @@ function GeneratorPageContent() {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
+      console.log(error);
       return null;
     } finally {
       console.log("finally");
@@ -90,14 +88,10 @@ function GeneratorPageContent() {
   };
 
   const handleGetResults = async () => {
-    setIsPlayerReady(false);
-
     const sailorData = await fetchResults();
     if (sailorData) {
       setResults(sailorData);
       handleSelectResult(sailorData[0]);
-    } else {
-      handleInvalidUrl();
     }
   };
 
@@ -129,60 +123,55 @@ function GeneratorPageContent() {
     });
   };
 
-  const handleInvalidUrl = () => {
-    setInvalidUrl(true);
-    setTimeout(() => {
-      setInvalidUrl(false);
-    }, 3000);
-  };
-
-  useEffect(() => {
-    if (playerRef.current) {
-      if (isPlayerReady) {
-        playerRef.current.seekTo(0);
-        playerRef.current.play();
-      } else {
-        playerRef.current.seekTo(0);
-        playerRef.current.pause();
-      }
-    }
-  }, [isPlayerReady]);
-
-  useEffect(() => {
-    console.log("isPlayerReady", isPlayerReady);
-  }, [isPlayerReady]);
-
   return (
-    <div>
-      <div className="max-w-screen-md px-8 md:px-0 m-auto mb-5 mt-8">
-        {previewUrl && (
-          <div className="mb-4">
-            <Link
-              href="/"
-              className="text-blue-400 hover:text-blue-300 hover:underline inline-flex items-center"
+    <div className="min-h-screen w-screen flex flex-col md:flex md:items-center md:justify-center bg-gray-900 text-white relative p-4">
+      {previewUrl && (
+        <div className="absolute top-4 left-4 z-10">
+          <Link
+            href="/"
+            className="text-blue-400 hover:text-blue-300 hover:underline flex items-center text-sm bg-gray-800/70 px-3 py-1 rounded"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 mr-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                />
-              </svg>
-              Back to Admin Dashboard
-            </Link>
-          </div>
-        )}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Back to Admin Dashboard
+          </Link>
+        </div>
+      )}
 
-        <div className="flex justify-center mb-10 rounded-2xl">
-          {results.length > 0 ? (
-            <div className="w-[50%]">
+      <div className="flex flex-col-reverse md:flex-row w-full max-w-6xl gap-8 mt-12 md:mt-0">
+        <div>
+          <h2 className="text-white text-xl font-bold pl-4 mb-2">
+            Match Results
+          </h2>
+          <div className="w-full md:w-1/2 max-h-[80vh] overflow-y-auto p-4 bg-gray-800 rounded-2xl shadow-lg scrollbar">
+            {results.length > 0 ? (
+              <ResultsList
+                results={results}
+                onSelectResult={handleSelectResult}
+              />
+            ) : (
+              <div className="text-center p-8 text-gray-400">
+                {isLoading ? "Loading results..." : "No results loaded yet."}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="w-full md:w-1/2 flex flex-col items-center justify-center">
+          <div className="w-2/3 md:w-full aspect-[9/16] rounded-2xl shadow-lg overflow-hidden">
+            {results.length > 0 ? (
               <Player
                 ref={playerRef}
                 component={OneOnOne}
@@ -191,59 +180,30 @@ function GeneratorPageContent() {
                 fps={VIDEO_FPS}
                 compositionHeight={VIDEO_HEIGHT}
                 compositionWidth={VIDEO_WIDTH}
-                style={{ width: "100%" }}
+                style={{ width: "100%", height: "100%" }}
                 controls
                 autoPlay
                 loop
               />
-            </div>
-          ) : (
-            <div>
-              <h1 className="text-4xl text-white mb-4">Results Generator</h1>
-              <p className="text-xl text-white">
-                {isLoading
-                  ? "Loading Preview..."
-                  : "Enter a URL to fetch results"}
-              </p>
-            </div>
-          )}
-        </div>
-        <div className="flex flex-col gap-2 justify-center items-center text-white">
-          <div className="flex flex-col gap-2 w-full max-w-md">
-            <div className="flex flex-col gap-2">
-              <label htmlFor="url" className="sr-only">
-                Event URL
-              </label>
-              <input
-                id="url"
-                className="bg-transparent border-1 border-white rounded-md p-2 w-full"
-                style={{
-                  borderColor: invalidUrl ? "red" : "white",
-                }}
-                type="text"
-                placeholder="Enter url from matchracingresults.com"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-              />
-            </div>
-            {invalidUrl && (
-              <p className="text-red-500 text-sm mt-2 font-bold">Invalid URL</p>
-            )}
-            {error && invalidUrl && (
-              <div className="text-red-500 text-sm -mt-2">{error}</div>
-            )}
-            <button
-              onClick={handleGetResults}
-              disabled={isLoading}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
-            >
-              {isLoading ? "Loading..." : "Fetch Results"}
-            </button>
-            {results.length > 0 && (
-              <ResultsList
-                results={results}
-                onSelectResult={handleSelectResult}
-              />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center text-white p-4">
+                <h2 className="text-xl md:text-2xl mb-2 text-center">
+                  {(() => {
+                    if (isLoading) {
+                      return "Loading Preview...";
+                    } else if (results.length > 0) {
+                      return "Initializing Player...";
+                    } else {
+                      return "Select a result to preview";
+                    }
+                  })()}
+                </h2>
+                {!isLoading && results.length === 0 && (
+                  <p className="text-md text-gray-400 text-center">
+                    If you provided a URL, results should load automatically.
+                  </p>
+                )}
+              </div>
             )}
           </div>
         </div>
