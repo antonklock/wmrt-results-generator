@@ -80,12 +80,18 @@ const Home: NextPage = () => {
       playerRef.current.seekTo(0);
     }
 
+    const getRandomVideo = () => {
+      const randomVideo = Math.floor(Math.random() * 5) + 1;
+      return `/videos/wmrt-bg-0${randomVideo}.mp4`;
+    };
+
     setInputProps({
       ...inputProps,
       winner: result.winner,
       loser: result.loser,
       flight: result.flight,
       match: result.match,
+      bgVideoSrc: getRandomVideo(),
     });
   };
 

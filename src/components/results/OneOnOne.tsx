@@ -5,11 +5,13 @@ const OneOnOne = ({
   loser,
   flight,
   match,
+  bgVideoSrc,
 }: {
   winner: string;
   loser: string;
   flight: number;
   match: number;
+  bgVideoSrc: string;
 }) => {
   const frame = useCurrentFrame();
 
@@ -76,7 +78,7 @@ const OneOnOne = ({
 
   return (
     <>
-      <Video src="/videos/wmrt-bg-01.mp4" />
+      <Video src={bgVideoSrc} className="object-cover" />
       <AbsoluteFill className="opacity-85 bg-[#0c2340] w-[1080px] h-[1920px]"></AbsoluteFill>
       <div className="absolute inset-0 text-white">
         <div className="flex flex-col items-center justify-between h-full w-full">

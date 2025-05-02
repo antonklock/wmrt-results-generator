@@ -8,6 +8,7 @@ export const CompositionProps = z.object({
   match: z.number(),
   number1: z.number(),
   number2: z.number(),
+  bgVideoSrc: z.string(),
 });
 
 export const defaultMyCompProps: z.infer<typeof CompositionProps> = {
@@ -17,6 +18,7 @@ export const defaultMyCompProps: z.infer<typeof CompositionProps> = {
   match: 1,
   number1: 1,
   number2: 0,
+  bgVideoSrc: "/videos/wmrt-bg-01.mp4",
 };
 
 export const DURATION_IN_FRAMES = 449;
