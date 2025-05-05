@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation"; // Import hooks
 import { Event } from "../types/event"; // Adjusted path
 import { useLocalStorage } from "../lib/hooks/useLocalStorage"; // Adjusted path
 import { EventGrid } from "../components/admin/EventGrid"; // Import the new component
+import React, { Suspense } from "react"; // Import Suspense
 
 // Interface for the fetched events cache
 interface FetchedEventsCache {
@@ -20,8 +21,8 @@ const generateUUID = () =>
     return v.toString(16);
   });
 
-// Renamed component to reflect it's now the main page
-export default function MainPage() {
+// New component containing the main logic that uses client-side hooks
+function MainPageContent() {
   const router = useRouter(); // Get router instance
   const searchParams = useSearchParams(); // Get search params
 
@@ -268,5 +269,21 @@ export default function MainPage() {
         </>
       )}
     </div>
+  );
+}
+
+// The main page component now wraps MainPageContent in Suspense
+export default function MainPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto p-4 md:p-8 bg-gray-900 text-white min-h-screen text-center">
+          <p>Loading Dashboard...</p>
+        </div>
+      }
+    >
+      \
+      <MainPageContent />
+    </Suspense>
   );
 }
