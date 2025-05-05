@@ -1,5 +1,6 @@
 import "../../styles/global.css";
 import { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   title: "Remotion and Next.js",
@@ -19,7 +20,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-[#101828]">{children}</body>
+      <body className="bg-[#101828]">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }

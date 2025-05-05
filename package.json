@@ -17,6 +17,7 @@
     "@remotion/player": "4.0.287",
     "@remotion/shapes": "4.0.287",
     "@remotion/tailwind-v4": "4.0.287",
+    "@vercel/analytics": "^1.5.0",
     "clsx": "2.1.1",
     "lottie-react": "^2.4.1",
     "lottie-web": "^5.12.2",
