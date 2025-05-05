@@ -30,6 +30,7 @@ type MatchResult = {
 function GeneratorPageContent() {
   const searchParams = useSearchParams();
   const previewUrl = searchParams.get("previewUrl");
+  const fromView = searchParams.get("fromView");
 
   const [inputProps, setInputProps] =
     useState<z.infer<typeof CompositionProps>>(defaultMyCompProps);
@@ -41,6 +42,8 @@ function GeneratorPageContent() {
   const [bgVideoSrc, setBgVideoSrc] = useState<string>(
     "https://www.kwmedia.klockworks.xyz/projects/wmrt-results-generator/bg-videos/wmrt-bg-01.mp4",
   );
+
+  const backLinkHref = fromView === "allEvents" ? "/?view=allEvents" : "/";
 
   useEffect(() => {
     if (previewUrl) {
@@ -128,7 +131,7 @@ function GeneratorPageContent() {
       {previewUrl && (
         <div className="absolute top-4 left-4 z-10">
           <Link
-            href="/"
+            href={backLinkHref}
             className="text-blue-400 hover:text-blue-300 hover:underline flex items-center text-sm bg-gray-800/70 px-3 py-1 rounded"
           >
             <svg
